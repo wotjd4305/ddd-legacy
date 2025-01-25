@@ -9,7 +9,7 @@ public class StringCalculator {
     private static final String COLON_DELIMITER = ":";
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
-    public int add(String text) {
+    public static int add(String text) {
         if (isBlank(text)) {
             return 0;
         }
@@ -18,7 +18,7 @@ public class StringCalculator {
         return sum(toIntArrays(numbersString));
     }
 
-    public String[] split(String text) {
+    public static String[] split(String text) {
         Matcher m = pattern.matcher(text);
 
         if (m.find()) {
