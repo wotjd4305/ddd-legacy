@@ -15,7 +15,7 @@ public class StringCalculator {
         }
 
         String[] numbersString = split(text);
-        return sum(toIntArrays(numbersString));
+        return sum(numbersString);
     }
 
     public static String[] split(String text) {
@@ -33,27 +33,8 @@ public class StringCalculator {
         return (text == null || text.isBlank());
     }
 
-    private static boolean isNegative(int number) {
-        return number < 0;
-    }
-
-    private static int[] toIntArrays(String[] values) {
-        int[] numbers = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-            int number = Integer.parseInt(values[i]);
-            if (isNegative(number)) {
-                throw new RuntimeException("음수는 불가능합니다.");
-            }
-            numbers[i] = number;
-        }
-        return numbers;
-    }
-
-    private static int sum(int[] numbers) {
-        int sum = 0;
-        for (int number : numbers) {
-            sum += number;
-        }
-        return sum;
+    private static int sum(String[] numbers) {
+        Positives positives = new Positives(numbers);
+        return positives.sum();
     }
 }
