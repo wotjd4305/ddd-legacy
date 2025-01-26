@@ -4,18 +4,22 @@ public class Positive {
 
     private final int number;
 
-    public Positive(String text) {
-        this.number = Integer.parseInt(text);
-        if (isNegative(this.number)) {
+    public Positive(int number) {
+        if (isNegative(number)) {
             throw new RuntimeException("음수는 입력할 수 없습니다.");
         }
+        this.number = number;
     }
 
-    private static boolean isNegative(int number) {
-        return number < 0;
+    public Positive(String text) {
+        this(Integer.parseInt(text));
     }
 
-    public int getNumber() {
+    public int sum() {
         return this.number;
+    }
+
+    private boolean isNegative(int number) {
+        return number < 0;
     }
 }

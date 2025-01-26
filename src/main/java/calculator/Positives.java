@@ -1,6 +1,6 @@
 package calculator;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Positives {
@@ -8,16 +8,14 @@ public class Positives {
     private List<Positive> positiveList;
 
     public Positives(String[] textArray) {
-        positiveList = new ArrayList<>();
-
-        for(String text : textArray){
-            positiveList.add(new Positive(text));
-        }
+        positiveList = Arrays.stream(textArray)
+            .map(Positive::new)
+            .toList();
     }
 
     public int sum() {
         return positiveList.stream()
-            .mapToInt(Positive::getNumber)
+            .mapToInt(Positive::sum)
             .sum();
     }
 }
