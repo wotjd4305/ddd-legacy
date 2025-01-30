@@ -17,12 +17,16 @@ public class Positive {
         this(Integer.parseInt(text));
     }
 
-    public int sum() {
-        return this.number;
+    public Positive plus(Positive other) {
+        return new Positive(this.number + other.number);
     }
 
     private boolean isNegative(int number) {
         return number < 0;
+    }
+
+    public int getNumber() {
+        return this.number;
     }
 
     @Override

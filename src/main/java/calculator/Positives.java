@@ -15,7 +15,7 @@ public class Positives {
 
     public int sum() {
         return positiveList.stream()
-            .mapToInt(Positive::sum)
-            .sum();
+            .reduce(new Positive(0), Positive::plus)
+            .getNumber();
     }
 }
