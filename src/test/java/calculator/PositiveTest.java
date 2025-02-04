@@ -27,6 +27,6 @@ class PositiveTest {
     void sum(final int number) {
         Positive positive = new Positive(number);
 
-        assertThat(positive.sum()).isEqualTo(number);
+        assertThat(positive.getNumber()).isEqualTo(number);
     }
 }
