@@ -252,7 +252,7 @@ class MenuServiceTest {
             menuProduct.setProductId(productId);
             menuProduct.setQuantity(1);
 
-            Menu request = createMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = createMenu("멕시칸", BigDecimal.valueOf(5000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
                 .willReturn(Optional.of(menuGroup));
