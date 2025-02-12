@@ -73,19 +73,19 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroupId))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                .willReturn(false);
+                    .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                .willAnswer(invocation -> {
-                    Menu saved = invocation.getArgument(0);
-                    saved.setId(UUID.randomUUID());
-                    return saved;
-                });
+                    .willAnswer(invocation -> {
+                        Menu saved = invocation.getArgument(0);
+                        saved.setId(UUID.randomUUID());
+                        return saved;
+                    });
 
             // when
             Menu created = menuService.create(request);
@@ -125,23 +125,23 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroupId))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                .willReturn(false);
+                    .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                .willAnswer(invocation -> {
-                    Menu saved = invocation.getArgument(0);
-                    saved.setId(UUID.randomUUID());
-                    return saved;
-                });
+                    .willAnswer(invocation -> {
+                        Menu saved = invocation.getArgument(0);
+                        saved.setId(UUID.randomUUID());
+                        return saved;
+                    });
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -170,23 +170,23 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroupId))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                .willReturn(false);
+                    .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                .willAnswer(invocation -> {
-                    Menu saved = invocation.getArgument(0);
-                    saved.setId(UUID.randomUUID());
-                    return saved;
-                });
+                    .willAnswer(invocation -> {
+                        Menu saved = invocation.getArgument(0);
+                        saved.setId(UUID.randomUUID());
+                        return saved;
+                    });
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -199,11 +199,11 @@ class MenuServiceTest {
             request.setName("치킨");
 
             given(menuGroupRepository.findById(any()))
-                .willReturn(Optional.empty());
+                    .willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOf(NoSuchElementException.class);
         }
 
         @Test
@@ -225,15 +225,15 @@ class MenuServiceTest {
             Menu request = createMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of());
+                    .willReturn(List.of());
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -255,15 +255,15 @@ class MenuServiceTest {
             Menu request = createMenu("멕시칸", BigDecimal.valueOf(5000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -285,15 +285,15 @@ class MenuServiceTest {
             Menu request = createMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
@@ -315,17 +315,17 @@ class MenuServiceTest {
             Menu request = createMenu("비속어", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
+                    .willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(List.of(productId)))
-                .willReturn(List.of(product));
+                    .willReturn(List.of(product));
             given(productRepository.findById(productId))
-                .willReturn(Optional.of(product));
+                    .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                .willReturn(true);
+                    .willReturn(true);
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -349,7 +349,7 @@ class MenuServiceTest {
             request.setPrice(BigDecimal.valueOf(10000));
 
             given(menuRepository.findById(menu.getId()))
-                .willReturn(Optional.of(menu));
+                    .willReturn(Optional.of(menu));
 
             // when
             Menu updated = menuService.changePrice(menu.getId(), request);
@@ -376,11 +376,11 @@ class MenuServiceTest {
             request.setPrice(BigDecimal.valueOf(price));
 
             given(menuRepository.findById(menu.getId()))
-                .willReturn(Optional.of(menu));
+                    .willReturn(Optional.of(menu));
 
             // when & then
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -401,7 +401,7 @@ class MenuServiceTest {
             Menu menu = createMenu(BigDecimal.valueOf(4000), List.of(menuProduct), false);
 
             given(menuRepository.findById(menu.getId()))
-                .willReturn(Optional.of(menu));
+                    .willReturn(Optional.of(menu));
 
             // when
             Menu displayed = menuService.display(menu.getId());
@@ -426,11 +426,11 @@ class MenuServiceTest {
             Menu menu = createMenu(BigDecimal.valueOf(5000), List.of(menuProduct), true);
 
             given(menuRepository.findById(menuId))
-                .willReturn(Optional.of(menu));
+                    .willReturn(Optional.of(menu));
 
             // when & then
             assertThatThrownBy(() -> menuService.display(menuId))
-                .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
@@ -440,7 +440,7 @@ class MenuServiceTest {
             Menu menu = createMenu(true);
 
             given(menuRepository.findById(menu.getId()))
-                .willReturn(Optional.of(menu));
+                    .willReturn(Optional.of(menu));
 
             // when
             Menu hidden = menuService.hide(menu.getId());
@@ -458,7 +458,7 @@ class MenuServiceTest {
         Menu menu2 = createMenu("BBQ치킨", BigDecimal.valueOf(23000));
 
         given(menuRepository.findAll())
-            .willReturn(List.of(menu1, menu2));
+                .willReturn(List.of(menu1, menu2));
 
         // when
         List<Menu> menus = menuService.findAll();
