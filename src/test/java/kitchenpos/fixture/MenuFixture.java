@@ -13,7 +13,17 @@ public class MenuFixture {
         final var menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setPrice(price);
+        menu.setDisplayed(true);
         menu.setName(name);
+        return menu;
+    }
+
+    public static Menu createMenu(String name, BigDecimal price, boolean isDisplayed) {
+        final var menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setPrice(price);
+        menu.setName(name);
+        menu.setDisplayed(isDisplayed);
         return menu;
     }
 
