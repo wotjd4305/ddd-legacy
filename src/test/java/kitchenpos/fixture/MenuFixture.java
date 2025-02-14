@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class MenuFixture {
 
-    public static Menu createMenu(String name, BigDecimal price) {
+    public static Menu createDisplayedMenu(String name, BigDecimal price) {
         final var menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setPrice(price);

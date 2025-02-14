@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -114,7 +115,7 @@ class OrderServiceTest {
             @DisplayName("주문 내역의 가격과 메뉴의 가격이 동일해야 한다.")
             void create_fail_different_price() {
                 // given
-                Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+                Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 1, BigDecimal.valueOf(12000));
 
                 Order request = createOrder(OrderType.DELIVERY, List.of(orderLineItem));
@@ -139,7 +140,7 @@ class OrderServiceTest {
                 Order request = createOrder(orderType, List.of(orderLineItem));
 
                 given(menuRepository.findAllByIdIn(List.of(orderLineItem.getMenuId())))
-                    .willReturn(List.of(createMenu("BBQ치킨", BigDecimal.valueOf(10000))));
+                    .willReturn(List.of(MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000))));
 
                 // when, then
                 assertThatThrownBy(() -> orderService.create(request))
@@ -156,7 +157,7 @@ class OrderServiceTest {
             void create_delivery() {
 
                 // given
-                Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+                Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 2, BigDecimal.valueOf(10000));
                 Order request = createDeliveryOrder(List.of(orderLineItem), "분당구");
 
@@ -201,7 +202,7 @@ class OrderServiceTest {
                 // given
                 UUID tableId = UUID.randomUUID();
 
-                Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+                Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
                 OrderTable orderTable = createOrderTable(1);
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 1, BigDecimal.valueOf(10000));
 
@@ -233,7 +234,7 @@ class OrderServiceTest {
                 // given
                 UUID tableId = UUID.randomUUID();
 
-                Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+                Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 1, BigDecimal.valueOf(10000));
                 Order request = createEatInOrder(OrderType.EAT_IN, tableId, List.of(orderLineItem));
 
@@ -258,7 +259,7 @@ class OrderServiceTest {
             @DisplayName("포장 주문을 정상 생성한다")
             void create_success() {
                 // given
-                Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+                Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 1, BigDecimal.valueOf(10000));
 
                 Order request = createOrder(OrderType.TAKEOUT, List.of(orderLineItem));
@@ -320,7 +321,7 @@ class OrderServiceTest {
         @DisplayName("배달 주문은 배달을 요청한다.")
         void accept_success_delivery_order() {
             // given
-            Menu menu = createMenu("BBQ치킨", BigDecimal.valueOf(10000));
+            Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
 
             OrderLineItem orderLineItem = createOrderLineItem(2, BigDecimal.valueOf(10000));
             orderLineItem.setMenu(menu);

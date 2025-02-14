@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -454,8 +455,8 @@ class MenuServiceTest {
     @DisplayName("메뉴 전부 가져올 수 있다.")
     void findAll() {
         // given
-        Menu menu1 = createMenu("멕시칸치킨", BigDecimal.valueOf(18000));
-        Menu menu2 = createMenu("BBQ치킨", BigDecimal.valueOf(23000));
+        Menu menu1 = MenuFixture.createDisplayedMenu("멕시칸치킨", BigDecimal.valueOf(18000));
+        Menu menu2 = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(23000));
 
         given(menuRepository.findAll())
                 .willReturn(List.of(menu1, menu2));
