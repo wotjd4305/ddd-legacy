@@ -18,6 +18,17 @@ public class MenuFixture {
         return menu;
     }
 
+    public static Menu createDisplayedMenu(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts) {
+        final var menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuProducts(menuProducts);
+        menu.setDisplayed(true);
+        return menu;
+    }
+
     public static Menu createMenu(String name, BigDecimal price, boolean isDisplayed) {
         final var menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -33,16 +44,6 @@ public class MenuFixture {
         menu.setPrice(price);
         menu.setMenuProducts(menuProducts);
         menu.setDisplayed(isDisplayed);
-        return menu;
-    }
-
-    public static Menu createMenu(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts) {
-        final var menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
-        menu.setMenuProducts(menuProducts);
         return menu;
     }
 

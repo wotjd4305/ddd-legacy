@@ -16,8 +16,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuFixture.*;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
+import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,43 +51,36 @@ class MenuServiceTest {
         @DisplayName("메뉴를 생성한다")
         void create() {
             // given
-            UUID productId = UUID.randomUUID();
-            UUID menuGroupId = UUID.randomUUID();
+            MenuGroup menuGroup = createMenuGroup("치킨");
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(menuGroupId);
-            menuGroup.setName("치킨");
-
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(15000));
+            Product product = createProduct(BigDecimal.valueOf(15000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
             Menu request = new Menu();
             request.setName("콜라");
             request.setPrice(BigDecimal.valueOf(3000));
-            request.setMenuGroupId(menuGroupId);
+            request.setMenuGroupId(menuGroup.getId());
             request.setDisplayed(true);
             request.setMenuProducts(List.of(menuProduct));
 
-            given(menuGroupRepository.findById(menuGroupId))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(menuGroup.getId()))
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                    .willReturn(false);
+                .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                    .willAnswer(invocation -> {
-                        Menu saved = invocation.getArgument(0);
-                        saved.setId(UUID.randomUUID());
-                        return saved;
-                    });
+                .willAnswer(invocation -> {
+                    Menu saved = invocation.getArgument(0);
+                    saved.setId(UUID.randomUUID());
+                    return saved;
+                });
 
             // when
             Menu created = menuService.create(request);
@@ -104,229 +98,192 @@ class MenuServiceTest {
         @DisplayName("메뉴명은 비어있으면 안된다.")
         void create_fail_no_name() {
             // given
-            UUID productId = UUID.randomUUID();
             UUID menuGroupId = UUID.randomUUID();
 
             MenuGroup menuGroup = createMenuGroup("치킨");
 
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(15000));
+            Product product = createProduct(BigDecimal.valueOf(15000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
-            Menu request = new Menu();
-            request.setName(null);
-            request.setPrice(BigDecimal.valueOf(15000));
-            request.setMenuGroupId(menuGroupId);
-            request.setDisplayed(true);
-            request.setMenuProducts(List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu(null, BigDecimal.valueOf(15000), menuGroupId, List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroupId))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                    .willReturn(false);
+                .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                    .willAnswer(invocation -> {
-                        Menu saved = invocation.getArgument(0);
-                        saved.setId(UUID.randomUUID());
-                        return saved;
-                    });
+                .willAnswer(invocation -> {
+                    Menu saved = invocation.getArgument(0);
+                    saved.setId(UUID.randomUUID());
+                    return saved;
+                });
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴 가격은 0원 이상이여야 한다.")
         void create_fail_no_price() {
             // given
-            UUID productId = UUID.randomUUID();
-            UUID menuGroupId = UUID.randomUUID();
-
             MenuGroup menuGroup = createMenuGroup("치킨");
 
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(15000));
+            Product product = createProduct(BigDecimal.valueOf(15000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
-            Menu request = new Menu();
-            request.setName("멕시칸 치킨");
-            request.setPrice(BigDecimal.valueOf(-1));
-            request.setMenuGroupId(menuGroupId);
-            request.setDisplayed(true);
-            request.setMenuProducts(List.of(menuProduct));
+            Menu request = createDisplayedMenu("멕시칸 치킨", BigDecimal.valueOf(-1), menuGroup.getId(), List.of(menuProduct));
 
-            given(menuGroupRepository.findById(menuGroupId))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(menuGroup.getId()))
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                    .willReturn(false);
+                .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
-                    .willAnswer(invocation -> {
-                        Menu saved = invocation.getArgument(0);
-                        saved.setId(UUID.randomUUID());
-                        return saved;
-                    });
+                .willAnswer(invocation -> {
+                    Menu saved = invocation.getArgument(0);
+                    saved.setId(UUID.randomUUID());
+                    return saved;
+                });
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴는 메뉴 그룹을 설정해줘야 한다.")
         void create_fail_no_menuGroup() {
             // given
-            Menu request = new Menu();
-            request.setId(UUID.randomUUID());
-            request.setPrice(BigDecimal.valueOf(15000));
-            request.setName("치킨");
+            Menu request = createDisplayedMenu("치킨", BigDecimal.valueOf(15000));
 
             given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.empty());
+                .willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NoSuchElementException.class);
         }
 
         @Test
         @DisplayName("메뉴 생성 시, 존재하는 상품이여야 한다.")
         void create_fail_non_exist_product() {
             // given
-            UUID productId = UUID.randomUUID();
-
             MenuGroup menuGroup = createMenuGroup("치킨세트");
 
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
-            Menu request = createMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of());
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of());
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴의 가격은 메뉴 상품 가격의 총합 보다 높을 수 없다.")
         void create_fail_total_productPrice() {
             // given
-            UUID productId = UUID.randomUUID();
+           MenuGroup menuGroup = createMenuGroup("치킨세트");
 
-            MenuGroup menuGroup = createMenuGroup("치킨세트");
-
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
-            Menu request = createMenu("멕시칸", BigDecimal.valueOf(5000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(5000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴의 상품들의 수량은 0개 이상이여야 한다.")
         void create_fail_invalid_product_quantity() {
             // given
-            UUID productId = UUID.randomUUID();
-
             MenuGroup menuGroup = createMenuGroup("치킨세트");
 
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(0);
 
-            Menu request = createMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴 이름은 비속어가 포함될 수 없다.")
         void create_fail_purgomalum_menu_name() {
             // given
-            UUID productId = UUID.randomUUID();
-
             MenuGroup menuGroup = createMenuGroup("치킨세트");
 
-            Product product = new Product();
-            product.setId(productId);
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(productId);
+            menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
 
-            Menu request = createMenu("비속어", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu("비속어", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
 
             given(menuGroupRepository.findById(menuGroup.getId()))
-                    .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(productId)))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(productId))
-                    .willReturn(Optional.of(product));
+                .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(List.of(product.getId())))
+                .willReturn(List.of(product));
+            given(productRepository.findById(product.getId()))
+                .willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(request.getName()))
-                    .willReturn(true);
+                .willReturn(true);
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -337,8 +294,7 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격을 변경한다")
         void changePrice() {
             // given
-            Product product = new Product();
-            product.setPrice(BigDecimal.valueOf(12000));
+            Product product = createProduct(BigDecimal.valueOf(12000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
@@ -350,7 +306,7 @@ class MenuServiceTest {
             request.setPrice(BigDecimal.valueOf(10000));
 
             given(menuRepository.findById(menu.getId()))
-                    .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(menu));
 
             // when
             Menu updated = menuService.changePrice(menu.getId(), request);
@@ -364,8 +320,7 @@ class MenuServiceTest {
         @ValueSource(ints = {-1, 15000})
         void changePrice_fail_illegal_price(final int price) {
             // given
-            Product product = new Product();
-            product.setPrice(BigDecimal.valueOf(12000));
+            Product product = createProduct(BigDecimal.valueOf(12000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
@@ -377,11 +332,11 @@ class MenuServiceTest {
             request.setPrice(BigDecimal.valueOf(price));
 
             given(menuRepository.findById(menu.getId()))
-                    .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(menu));
 
             // when & then
             assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
-                    .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -392,8 +347,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 전시 상태 ON 하기")
         void display() {
             // given
-            Product product = new Product();
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
@@ -402,7 +356,7 @@ class MenuServiceTest {
             Menu menu = createMenu(BigDecimal.valueOf(4000), List.of(menuProduct), false);
 
             given(menuRepository.findById(menu.getId()))
-                    .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(menu));
 
             // when
             Menu displayed = menuService.display(menu.getId());
@@ -417,8 +371,7 @@ class MenuServiceTest {
 
             // given
             UUID menuId = UUID.randomUUID();
-            Product product = new Product();
-            product.setPrice(BigDecimal.valueOf(4000));
+            Product product = createProduct(BigDecimal.valueOf(4000));
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
@@ -427,11 +380,11 @@ class MenuServiceTest {
             Menu menu = createMenu(BigDecimal.valueOf(5000), List.of(menuProduct), true);
 
             given(menuRepository.findById(menuId))
-                    .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(menu));
 
             // when & then
             assertThatThrownBy(() -> menuService.display(menuId))
-                    .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
@@ -441,7 +394,7 @@ class MenuServiceTest {
             Menu menu = createMenu(true);
 
             given(menuRepository.findById(menu.getId()))
-                    .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(menu));
 
             // when
             Menu hidden = menuService.hide(menu.getId());
@@ -459,7 +412,7 @@ class MenuServiceTest {
         Menu menu2 = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(23000));
 
         given(menuRepository.findAll())
-                .willReturn(List.of(menu1, menu2));
+            .willReturn(List.of(menu1, menu2));
 
         // when
         List<Menu> menus = menuService.findAll();
