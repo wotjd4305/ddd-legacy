@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.InMemoryMenuGroupRepository;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
@@ -17,9 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 class MenuGroupServiceTest {
 
@@ -28,7 +26,7 @@ class MenuGroupServiceTest {
 
     @BeforeEach
     void setUp() {
-        menuGroupRepository = mock(MenuGroupRepository.class);
+        menuGroupRepository = new InMemoryMenuGroupRepository();
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
@@ -43,11 +41,9 @@ class MenuGroupServiceTest {
             // given
             MenuGroup menuGroup = MenuGroupFixture.createMenuGroup(name);
 
-            given(menuGroupRepository.save(any(MenuGroup.class))).willReturn(menuGroup);
-
             //when,then
             assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-                .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("새로운 메뉴 그룹을 생성할 수 있다.")
@@ -57,13 +53,13 @@ class MenuGroupServiceTest {
             // given
             MenuGroup menuGroup = MenuGroupFixture.createMenuGroup(name);
 
-            given(menuGroupRepository.save(any(MenuGroup.class))).willReturn(menuGroup);
-
             // when
             MenuGroup actual = menuGroupService.create(menuGroup);
+            MenuGroup expect = menuGroupRepository.findById(actual.getId())
+                    .orElse(new MenuGroup());
 
             //then
-            assertThat(actual).isEqualTo(menuGroup);
+            assertThat(actual).isEqualTo(expect);
         }
     }
 
@@ -71,16 +67,16 @@ class MenuGroupServiceTest {
     @Test
     void findAll() {
         // given
-        MenuGroup menuGroup = MenuGroupFixture.createMenuGroup("추천메뉴");
-        given(menuGroupRepository.findAll()).willReturn(List.of(menuGroup));
+        MenuGroup menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
+        menuGroupRepository.save(menuGroup);
 
         // when
         List<MenuGroup> result = menuGroupService.findAll();
 
         // then
         assertAll(
-            () -> assertThat(result).isNotEmpty(),
-            () -> assertEquals(result.size(), 1)
+                () -> assertThat(result).isNotEmpty(),
+                () -> assertEquals(result.size(), 1)
         );
     }
 }
