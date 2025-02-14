@@ -34,6 +34,10 @@ class MenuServiceTest {
 
     private MenuService menuService;
 
+    private Product defaultProduct;
+    private MenuGroup defaultMenuGroup;
+    private MenuProduct defaultMenuProduct;
+
     @BeforeEach
     void setUp() {
         menuRepository = mock(MenuRepository.class);
@@ -41,6 +45,14 @@ class MenuServiceTest {
         productRepository = mock(ProductRepository.class);
         purgomalumClient = mock(PurgomalumClient.class);
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+
+        defaultProduct = createProduct("멕시칸 치킨", BigDecimal.valueOf(15000));
+        defaultMenuGroup = createMenuGroup("치킨메뉴");
+
+        defaultMenuProduct = new MenuProduct();
+        defaultMenuProduct.setProduct(defaultProduct);
+        defaultMenuProduct.setProductId(defaultProduct.getId());
+        defaultMenuProduct.setQuantity(1);
     }
 
     @Nested
@@ -51,28 +63,19 @@ class MenuServiceTest {
         @DisplayName("메뉴를 생성한다")
         void create() {
             // given
-            MenuGroup menuGroup = createMenuGroup("치킨");
-
-            Product product = createProduct(BigDecimal.valueOf(15000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
             Menu request = new Menu();
             request.setName("콜라");
             request.setPrice(BigDecimal.valueOf(3000));
-            request.setMenuGroupId(menuGroup.getId());
+            request.setMenuGroupId(defaultMenuGroup.getId());
             request.setDisplayed(true);
-            request.setMenuProducts(List.of(menuProduct));
+            request.setMenuProducts(List.of(defaultMenuProduct));
 
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
             given(purgomalumClient.containsProfanity(request.getName()))
                 .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
@@ -89,7 +92,7 @@ class MenuServiceTest {
             assertThat(created.getId()).isNotNull();
             assertThat(created.getName()).isEqualTo("콜라");
             assertThat(created.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(3000));
-            assertThat(created.getMenuGroup()).isEqualTo(menuGroup);
+            assertThat(created.getMenuGroup()).isEqualTo(defaultMenuGroup);
             assertThat(created.isDisplayed()).isTrue();
             assertThat(created.getMenuProducts()).hasSize(1);
         }
@@ -98,25 +101,14 @@ class MenuServiceTest {
         @DisplayName("메뉴명은 비어있으면 안된다.")
         void create_fail_no_name() {
             // given
-            UUID menuGroupId = UUID.randomUUID();
+            Menu request = MenuFixture.createDisplayedMenu(null, BigDecimal.valueOf(15000), defaultMenuGroup.getId(), List.of(defaultMenuProduct));
 
-            MenuGroup menuGroup = createMenuGroup("치킨");
-
-            Product product = createProduct(BigDecimal.valueOf(15000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
-            Menu request = MenuFixture.createDisplayedMenu(null, BigDecimal.valueOf(15000), menuGroupId, List.of(menuProduct));
-
-            given(menuGroupRepository.findById(menuGroupId))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
             given(purgomalumClient.containsProfanity(request.getName()))
                 .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
@@ -135,23 +127,14 @@ class MenuServiceTest {
         @DisplayName("메뉴 가격은 0원 이상이여야 한다.")
         void create_fail_no_price() {
             // given
-            MenuGroup menuGroup = createMenuGroup("치킨");
+            Menu request = createDisplayedMenu("멕시칸 치킨", BigDecimal.valueOf(-1), defaultMenuGroup.getId(), List.of(defaultMenuProduct));
 
-            Product product = createProduct(BigDecimal.valueOf(15000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
-            Menu request = createDisplayedMenu("멕시칸 치킨", BigDecimal.valueOf(-1), menuGroup.getId(), List.of(menuProduct));
-
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
             given(purgomalumClient.containsProfanity(request.getName()))
                 .willReturn(false);
             given(menuRepository.save(any(Menu.class)))
@@ -184,22 +167,14 @@ class MenuServiceTest {
         @DisplayName("메뉴 생성 시, 존재하는 상품이여야 한다.")
         void create_fail_non_exist_product() {
             // given
-            MenuGroup menuGroup = createMenuGroup("치킨세트");
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", defaultProduct.getPrice(), defaultMenuGroup.getId(), List.of(defaultMenuProduct));
 
-            Product product = createProduct(BigDecimal.valueOf(4000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
-            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
-
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
                 .willReturn(List.of());
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
@@ -210,22 +185,15 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격은 메뉴 상품 가격의 총합 보다 높을 수 없다.")
         void create_fail_total_productPrice() {
             // given
-           MenuGroup menuGroup = createMenuGroup("치킨세트");
+            BigDecimal exceededPrice = defaultProduct.getPrice().add(BigDecimal.valueOf(2000));
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", exceededPrice, defaultMenuGroup.getId(), List.of(defaultMenuProduct));
 
-            Product product = createProduct(BigDecimal.valueOf(4000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
-            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(5000), menuGroup.getId(), List.of(menuProduct));
-
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
@@ -236,22 +204,18 @@ class MenuServiceTest {
         @DisplayName("메뉴의 상품들의 수량은 0개 이상이여야 한다.")
         void create_fail_invalid_product_quantity() {
             // given
-            MenuGroup menuGroup = createMenuGroup("치킨세트");
-
-            Product product = createProduct(BigDecimal.valueOf(4000));
-
             MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(product.getId());
+            menuProduct.setProductId(defaultProduct.getId());
             menuProduct.setQuantity(0);
 
-            Menu request = MenuFixture.createDisplayedMenu("멕시칸", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
+            Menu request = MenuFixture.createDisplayedMenu("멕시칸", defaultProduct.getPrice(), defaultMenuGroup.getId(), List.of(menuProduct));
 
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
 
             // when & then
             assertThatThrownBy(() -> menuService.create(request))
@@ -262,22 +226,14 @@ class MenuServiceTest {
         @DisplayName("메뉴 이름은 비속어가 포함될 수 없다.")
         void create_fail_purgomalum_menu_name() {
             // given
-            MenuGroup menuGroup = createMenuGroup("치킨세트");
+            Menu request = MenuFixture.createDisplayedMenu("비속어", defaultProduct.getPrice(), defaultMenuGroup.getId(), List.of(defaultMenuProduct));
 
-            Product product = createProduct(BigDecimal.valueOf(4000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(product.getId());
-            menuProduct.setQuantity(1);
-
-            Menu request = MenuFixture.createDisplayedMenu("비속어", BigDecimal.valueOf(4000), menuGroup.getId(), List.of(menuProduct));
-
-            given(menuGroupRepository.findById(menuGroup.getId()))
-                .willReturn(Optional.of(menuGroup));
-            given(productRepository.findAllByIdIn(List.of(product.getId())))
-                .willReturn(List.of(product));
-            given(productRepository.findById(product.getId()))
-                .willReturn(Optional.of(product));
+            given(menuGroupRepository.findById(defaultMenuGroup.getId()))
+                .willReturn(Optional.of(defaultMenuGroup));
+            given(productRepository.findAllByIdIn(List.of(defaultProduct.getId())))
+                .willReturn(List.of(defaultProduct));
+            given(productRepository.findById(defaultProduct.getId()))
+                .willReturn(Optional.of(defaultProduct));
             given(purgomalumClient.containsProfanity(request.getName()))
                 .willReturn(true);
 
@@ -294,16 +250,11 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격을 변경한다")
         void changePrice() {
             // given
-            Product product = createProduct(BigDecimal.valueOf(12000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            Menu menu = createMenu(BigDecimal.valueOf(12000), List.of(menuProduct), true);
+            BigDecimal actualChangedPrice = defaultProduct.getPrice().subtract(BigDecimal.valueOf(2000));
+            Menu menu = createMenu(actualChangedPrice, List.of(defaultMenuProduct), true);
 
             Menu request = new Menu();
-            request.setPrice(BigDecimal.valueOf(10000));
+            request.setPrice(actualChangedPrice);
 
             given(menuRepository.findById(menu.getId()))
                 .willReturn(Optional.of(menu));
@@ -312,21 +263,16 @@ class MenuServiceTest {
             Menu updated = menuService.changePrice(menu.getId(), request);
 
             // then
-            assertThat(updated.getPrice()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+            assertThat(updated.getPrice()).isEqualByComparingTo(actualChangedPrice);
         }
 
         @DisplayName("메뉴의 가격을 변경 시 가격에 따른 실패")
         @ParameterizedTest(name = "변경할 메뉴 가격 : `{0}`")
-        @ValueSource(ints = {-1, 15000})
+        @ValueSource(ints = {-1, 17000})
         void changePrice_fail_illegal_price(final int price) {
             // given
-            Product product = createProduct(BigDecimal.valueOf(12000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            Menu menu = createMenu(BigDecimal.valueOf(12000), List.of(menuProduct), true);
+            BigDecimal actualChangedPrice = defaultProduct.getPrice().add(BigDecimal.valueOf(2000));
+            Menu menu = createMenu(actualChangedPrice, List.of(defaultMenuProduct), true);
 
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(price));
@@ -347,13 +293,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 전시 상태 ON 하기")
         void display() {
             // given
-            Product product = createProduct(BigDecimal.valueOf(4000));
-
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            Menu menu = createMenu(BigDecimal.valueOf(4000), List.of(menuProduct), false);
+            Menu menu = createMenu(defaultProduct.getPrice(), List.of(defaultMenuProduct), false);
 
             given(menuRepository.findById(menu.getId()))
                 .willReturn(Optional.of(menu));
@@ -368,16 +308,11 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴의 가격은 메뉴 상품 가격의 총합 보다 높을 수 없다.")
         void display_fail_total_productPrice() {
-
             // given
             UUID menuId = UUID.randomUUID();
-            Product product = createProduct(BigDecimal.valueOf(4000));
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            Menu menu = createMenu(BigDecimal.valueOf(5000), List.of(menuProduct), true);
+            BigDecimal exceededPrice = defaultProduct.getPrice().add(BigDecimal.valueOf(2000));
+            Menu menu = createMenu(exceededPrice, List.of(defaultMenuProduct), true);
 
             given(menuRepository.findById(menuId))
                 .willReturn(Optional.of(menu));
