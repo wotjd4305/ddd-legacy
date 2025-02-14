@@ -22,7 +22,7 @@ public class OrderTableFixture {
         return orderTable;
     }
 
-    public static OrderTable createOrderTable(int numberOfGuests) {
+    public static OrderTable createOccupiedOrderTable(int numberOfGuests) {
         final var orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName("익명 테이블");

@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +21,6 @@ import java.util.UUID;
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
-import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -203,7 +203,7 @@ class OrderServiceTest {
                 UUID tableId = UUID.randomUUID();
 
                 Menu menu = MenuFixture.createDisplayedMenu("BBQ치킨", BigDecimal.valueOf(10000));
-                OrderTable orderTable = createOrderTable(1);
+                OrderTable orderTable = OrderTableFixture.createOccupiedOrderTable(1);
                 OrderLineItem orderLineItem = createOrderLineItem(menu.getId(), 1, BigDecimal.valueOf(10000));
 
                 Order request = createEatInOrder(OrderType.EAT_IN, tableId, List.of(orderLineItem));
@@ -472,7 +472,7 @@ class OrderServiceTest {
         @DisplayName("매장 주문을 완료한다")
         void complete_eat_in_order_success() {
             // given
-            OrderTable orderTable = createOrderTable(1);
+            OrderTable orderTable = OrderTableFixture.createOccupiedOrderTable(1);
 
             Order order = createOrder(OrderType.EAT_IN, OrderStatus.SERVED);
             order.setOrderTable(orderTable);
@@ -520,7 +520,7 @@ class OrderServiceTest {
         @DisplayName("매장 주문은 주문 완료 후, 테이블 정리를 추가로 진행한다.")
         void complete_eat_in_order_do_clear_table() {
             // given
-            OrderTable orderTable = createOrderTable(2);
+            OrderTable orderTable = OrderTableFixture.createOccupiedOrderTable(2);
 
             Order order = createOrder(OrderType.EAT_IN, OrderStatus.SERVED);
             order.setOrderTable(orderTable);

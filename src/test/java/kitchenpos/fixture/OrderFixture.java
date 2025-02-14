@@ -24,15 +24,6 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order createOrder(OrderType type, OrderStatus orderStatus, List<OrderLineItem> orderLineItems) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(type);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(orderLineItems);
-        return order;
-    }
-
     public static Order createOrder(OrderType type, OrderStatus orderStatus) {
         Order order = new Order();
         order.setId(UUID.randomUUID());

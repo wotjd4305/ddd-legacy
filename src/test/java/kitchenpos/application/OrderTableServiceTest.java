@@ -4,6 +4,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -102,7 +103,7 @@ class OrderTableServiceTest {
         @DisplayName("테이블 정상 정리")
         void clear() {
             // given
-            OrderTable orderTable = createOrderTable(3);
+            OrderTable orderTable = OrderTableFixture.createOccupiedOrderTable(3);
 
             given(orderTableRepository.findById(orderTable.getId()))
                 .willReturn(Optional.of(orderTable));
@@ -121,7 +122,7 @@ class OrderTableServiceTest {
         @DisplayName("테이블을 정리하기 위해서는 주문이 완료여야 한다.")
         void clear_fail_invalid_order_status() {
             // given
-            OrderTable orderTable = createOrderTable(3);
+            OrderTable orderTable = OrderTableFixture.createOccupiedOrderTable(3);
 
             given(orderTableRepository.findById(orderTable.getId()))
                 .willReturn(Optional.of(orderTable));
@@ -159,7 +160,7 @@ class OrderTableServiceTest {
         @DisplayName("변경할 인원 수는 0명 이상이어야 한다.")
         void changeNumberOfGuestsWithNegativeNumber() {
             // given
-            OrderTable request = createOrderTable(-1);
+            OrderTable request = OrderTableFixture.createOccupiedOrderTable(-1);
 
             // when & then
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(request.getId(), request))
